@@ -1,2 +1,6 @@
-package com.fundamentos.springboot.fundamentos.component;public interface ComponetDependency {
+package com.fundamentos.springboot.fundamentos.component;
+
+public interface ComponetDependency {
+    void saludar();
+
 }
