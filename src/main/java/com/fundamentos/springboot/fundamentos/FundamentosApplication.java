@@ -38,11 +38,22 @@ public class FundamentosApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args)  {
+
+		clasesAnteriores();
+
+	}
+
+	public void clasesAnteriores(){
 		componetDependency.saludar();
 		myBean.print();
 		myBeaWithDependency.printWithDependency();
 		System.out.println(myBeanWithProperties.function());
 		System.out.println(userPojo.getEmail() + userPojo.getPassword());
-		LOGGER.error("Esto es un error del aplicativo");
+		try {
+
+		}catch (Exception e){
+			LOGGER.error("Esto es un error del aplicativo" + e.getMessage());
+		}
+
 	}
 }
