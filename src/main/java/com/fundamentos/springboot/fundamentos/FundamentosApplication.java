@@ -63,6 +63,24 @@ public class FundamentosApplication implements CommandLineRunner {
 		userRepository.findAndSort("John", Sort.by("id").descending())
 				.stream()
 				.forEach(user -> LOGGER.info("users con meotod sort"+user));
+
+		userRepository.findByName("John").stream().forEach(user -> LOGGER.info(" Usuario con query metod "+user));
+
+		LOGGER.info("usuario buscado por email y name por query metod" +
+				userRepository.findByNameAndEmail("John","john@domain.com").orElseThrow(
+						()-> new RuntimeException("No se encontro el usuario por query metod") ));
+
+		userRepository.findBynameLike("%John%").stream()
+				.forEach(user -> LOGGER.info("uso de like en query metods"+user));
+
+		userRepository.findByNameOrEmail(null,"john@domain.com").stream()
+				.forEach(user -> LOGGER.info("uso de like en query metods con or"+user));
+
+		userRepository.findByBirthDateBetween(LocalDate.of(2021,3,1),LocalDate.of(201,10,1)).stream()
+				.forEach(user -> LOGGER.info("uso de metod con uso de betweenr"+user));
+
+		userRepository.findByNameLikeOrderByIdDesc("%John%").stream()
+				.forEach(user -> LOGGER.info("uso de like en query metods con order by y like"+user));
 	}
 	private void saveUsersinDataBase(){
 		User user1 =new User("John","john@domain.com", LocalDate.of(2021,3,12));
