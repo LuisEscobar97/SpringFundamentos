@@ -7,6 +7,7 @@ import com.fundamentos.springboot.fundamentos.component.ComponetDependency;
 import com.fundamentos.springboot.fundamentos.entity.User;
 import com.fundamentos.springboot.fundamentos.pojo.UserPojo;
 import com.fundamentos.springboot.fundamentos.repository.UserRepository;
+import com.fundamentos.springboot.fundamentos.service.UserService;
 import com.sun.jdi.PrimitiveValue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,16 +30,18 @@ public class FundamentosApplication implements CommandLineRunner {
 	private MyBeanWithProperties myBeanWithProperties;
 	private UserPojo userPojo;
 	private UserRepository userRepository;
+	private UserService userService;
 
 	private final Log LOGGER= LogFactory.getLog(FundamentosApplication.class);
 
-	public FundamentosApplication(@Qualifier("componentTwoDependency") ComponetDependency componetDependency, MyBean myBean, MyBeaWithDependency myBeaWithDependency, MyBeanWithProperties myBeanWithProperties, UserPojo userPojo, UserRepository userRepository){
+	public FundamentosApplication(@Qualifier("componentTwoDependency") ComponetDependency componetDependency, MyBean myBean, MyBeaWithDependency myBeaWithDependency, MyBeanWithProperties myBeanWithProperties, UserPojo userPojo, UserRepository userRepository, UserService userService){
 		this.componetDependency=componetDependency;
 		this.myBean=myBean;
 		this.myBeaWithDependency=myBeaWithDependency;
 		this.myBeanWithProperties=myBeanWithProperties;
 		this.userPojo=userPojo;
 		this.userRepository=userRepository;
+		this.userService=userService;
 	}
 
 	public static void main(String[] args) {
@@ -52,6 +55,7 @@ public class FundamentosApplication implements CommandLineRunner {
 		try {
 			saveUsersinDataBase();
 			getInformationJPQL();
+			saveWithErrorTransactional();
 		}catch (Exception e){
 			LOGGER.error("Esto es un error del aplicativo" + e.getMessage());
 		}
@@ -81,6 +85,25 @@ public class FundamentosApplication implements CommandLineRunner {
 
 		userRepository.findByNameLikeOrderByIdDesc("%John%").stream()
 				.forEach(user -> LOGGER.info("uso de like en query metods con order by y like"+user));
+
+		LOGGER.info("usuario encontrdao por medio de named parameters"+userRepository.getAllByBithDateAndEmail(LocalDate.of(2021,3,12),"john@domain.com")
+				.orElseThrow(()->new RuntimeException("No se encontró el usurio a partir del name parameter")));
+	}
+	private void saveWithErrorTransactional(){
+		User user1 =new User("TestTrasanctional","TestTrasanctionaln@domain.com", LocalDate.of(2021,3,12));
+		User user2 =new User("TestTrasanctional2","TestTrasanctionaln3@domain.com", LocalDate.of(2021,3,12));
+		User user3 =new User("TestTrasanctional3","TestTrasanctionaln3@domain.com", LocalDate.of(2021,3,12));
+
+		List<User> users =Arrays.asList(user1,user2,user3);
+	try {
+		userService.savetransactional(users);
+	}catch (Exception e){
+		LOGGER.error("ese es un error de tipo transaccional");
+	}
+
+		userService.getAllUsers().stream().forEach(user ->
+				LOGGER.info("este es el usuario dentro del metodo transaccional"+ user));
+
 	}
 	private void saveUsersinDataBase(){
 		User user1 =new User("John","john@domain.com", LocalDate.of(2021,3,12));
