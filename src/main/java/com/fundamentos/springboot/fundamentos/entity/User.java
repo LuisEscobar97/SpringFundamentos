@@ -21,6 +21,7 @@ public class User {
     private String email;
 
     private LocalDate birthDate;
+
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<Post> posts= new ArrayList<>();
@@ -32,6 +33,10 @@ public class User {
         this.name = name;
         this.email = email;
         this.birthDate = birthDate;
+    }
+
+    public User(Long id) {
+        this.id=id;
     }
 
     public Long getId() {
